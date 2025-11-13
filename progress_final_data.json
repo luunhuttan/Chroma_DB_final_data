@@ -1,0 +1,97 @@
+{
+  "last_processed_index": 2,
+  "results": [
+    {
+      "query_id": "query_5662",
+      "query_text": "Looking for a sr. front- end developer with build reusable code templates, code, and libraries for future use and a background in b.a. in information technology.",
+      "category": "BE",
+      "target_person_id": "5662",
+      "difficulty": "standard",
+      "correct_count": 5,
+      "accuracy": 1.0,
+      "search_results": [
+        {
+          "title": "sr. developer, project manager, front end developer, contract developer, business analyst, sr. front end developer, adobe creative suite ui developer, technical trainer, developer, ui engineer, sr. usability analyst, consultant",
+          "skills": "development of client web sites and applications, functional requirement documentation, proposal and estimate development, organization of client projects, developed front end code for a proprietary cms, coding included html, css, sass, javascript, jquery and light php, heavy focus on ada-compliance, accessibility, created project estimates to communicate timelines to internal stakeholders and clients, coordination of project work between design and back end development teams, created and manipulated image assets, lead client meetings to determine scope and key business requirements, conducted peer reviews to ensure code quality and adherence to best practices, meeting with various teams and stakeholders for requirements gathering, development of front end code for inclusion in enterprise-level cms (aem), built front end components using html, grunt, assemble, handlebars, integration of front- end code into aem components, system, functional documentat writing, developed and presented internal department training, developed front end web, cms and e-commerce solutions with an emphasis on progressive enhancement, worked remotely on agile development projects, fostered relationships with client partners to secure additional contracts for the company, led development for company and client websites, design and develop e-commerce solutions for print clients, worked with customers to determine project scope, estimates & timelines, wrote and delivered client proposals, designed and delivered email marketing campaigns, overhauled and streamlined brilliant's development processes, developed e-commerce sites for clients such as petsmart and sony, requirement gathering, functional specification writing, code reviews, wrote and maintained technical training material; courses and tests for developers, reference, etc., requirements gathering, technical documentation writing, qa testing, built custom-cms with development team, designed and developed company and client sites and application, created graphics and logos for internal and client projects, performed usability reviews, wrote and conducted usability testing, competitive analysis research and documentation, html, js development, front end design and development for client sites, conducted usability analysis, technical document writing, business analysis, quality assurance, website testing",
+          "abilities": "content management, content management systems, web design, information architecture, requirement gathering, sql, testing, excel",
+          "program": "aas in interactive multimedia",
+          "distance": 0.7526466846466064
+        },
+        {
+          "title": "sr. front end web developer, sr. software engineer (frontend specialist), sr. ui developer, sr. front end developer, front end technical architect, sr. front end engineer, front end developer, front end web developer, sr. front end web engineer, web engineer, integrator, ui, ux designer, front end programmer, actionscript developer, front end web, actionscript programmer",
+          "skills": "specializes in common web standards and practices that insure site responsiveness, fast page load times, and cross-browser compatibility which consistently rank high in search engines, expert hand coder proficient in the development of sites, templates, flash intros and user-interfaces for small businesses, e-commerce sites, online magazines, and non-profit entities, knowledgeable of ui, ux design, soa, web services, sdlc, and video encoding, assists product managers with branding and marketing concepts. photo manipulation and retouching with photoshop, as well as digital portraiture and restoration, strong background with web design, performance optimization for spas, strives to stay at the forefront of front end technologies by evaluating emerging javascript libraries and technologies, utilized the agile sdlc to make updates and changes to the ui of the symitar app, symitar is a mean stack app (angularjs 1.5.7, bootstrap 3.3.7- on the frontend) that more than 4000 credit unions use to manager their customers, tasked with updating the frontend tooling pipeline from a combination grunt, gulp based solution to webpack 4, sole developer responsible for development of a greenfield in-house management, configuration tool, interpreted balsamiq mockups from the product owners, used angular 6 & bootstrap 4, along with charting.js to create the administrative dashboard, created proof of concepts for this tool by evaluating multiple js frameworks (angular(6), vue, react and aurelia), evaluated react, react router, redux(sagas, thunks) in the node-backed application, as a possible candidate for the frontend architecture. (used create-react-app for scaffolding), worked directly with the ux, ui designer to apply the redesign of the service console application, using bootstrap 3.36(sass), and angularjs 1.5.8, deployed various html5 videoplayers, utilizing multiple video frameworks(videogular, videojs, mediaelement.js, etc) to determine which would work best for the conversion from the current used silverlight player, produced a remark.js presentation examining the differences between mpeg-dash and hls video formats - describing the benefits and drawbacks to product owners, develops proprietary content management system using angularjs 1.5, setup the karma, jasmine, protractor ecosystem to enable unit, integration and e2e testing of the front end, implements new relic rum instrumentation in order to facilitate real-time monitoring of users, produced a true client-side cache-busting solution, developed a plan to upgrade an outdated proprietary content management system, ported an individually paged-based application to an angular-based spa, implemented the git vcs replace tortoise svn, responsible for interviewing and evaluating potential infoscions, created the pizza hut mexico single page angular js application which serves over 8 million people representing 200+ stores, used google and it's \"pindrop\" technology to geolocate potential customers, one of a two person team of developers working to make \"the federal deductions, income, and wages guide\" responsive, ensured all code adheres to best practices coding standards by going through and making sure that all new additional javascript code passes jshint standards, specializing in solving angularjs errors, problems, responsible for the integration of the trapster.com website, as well as implementing the html5 version of trapster's new feature \"etas\", utilizing here.com maps, used backbonejs, nodejs, amazon web services, elastic beanstalk, one of 2 front end developers to work on the roll out of the new super chevy super site a conglomerate site of all of source interlink media's chevy branded websites, implemented user interface and front- end solutions for a leading salesforce app using jquery, html5, css3, and the bootstrap framework, implemented client-side binding, templating for an asp.net business intelligence application utilizing the knockout javascript library, reviewed various html5 charting packages (wijmo, kendo ui, d3, infovis, jqplot, chartjs and fusioncharts), evaluated 3rd party self-service business intelligence dashboard frameworks (tableau, datazen, domo, pentaho), constructed an intranet portal to display the strengths and weaknesses of each dashboard framework as they pertain to the bhi platform, implemented user interface and front- end solutions using jquery, jquery mobile, site integration and content management, received deliverables from vendors and integrated them into the client's (disney) system. worked in an agile environment that utilized jira for ticket management, daily interaction with both interwoven teamsite cms as well as perforce. collaborated with dedicated producers and quality assurance teams, designed user interface for a web-based marketing solution, from conceptualization and detailed user interface and functionality design through implementation, collaborated with marketing, product management throughout all design phases, worked with the production team to implement ui enhancements and ultimately optimize user experience, spliced up a mockup of the command & conquer: generals 2 website, to create the active landing page for the blockbuster video game, re-factored their video player from as2 to as3 and incorporated functionality equivalent to that of the hulu and youtube players which was not present beforehand, re factored their mp3 player from as2 to as3, collaborated with both client-side and server-side engineers in order to keep the core structure of the application intact, javascript, jquery & other js frameworks (dojo, mootools), hard coding with xhtml 1.0 strict & css 2.0.seo implementation (for plain html pages and full flash sites), flash actionscript troubleshooting & debugging, daily interaction with interwoven teamsite cms system, omniture & hitbox web analytics, google analytics, one of three employees hired to specialize in the development of actionscript components and frameworks for stickam's video-chat-centric social networking site, client-side development of instant messaging and file browsing widgets, worked closely with information architects and design teams to deliver compelling online and desktop content, flash media server coding and maintenance, to insure proper delivery of image, audio and video content",
+          "abilities": "angularjs (10+ years), bootstrap (10+ years), html5 (10+ years), javascript (10+ years), mongodb (10+ years), angular, front end, ui, react, front-end, user interface, css3, jquery, node",
+          "program": "ba in economics",
+          "distance": 0.794880211353302
+        },
+        {
+          "title": "front-end developer, multimedia developer",
+          "skills": "html and html 5, css3, jquery, sql, php, responsive design, seo, sass, adobe creative suite, photoshop, lightroom, illustrator, indesign, after effects, dreamweaver, web development, wordpress and drupal cms administration, social media implementation, print production, digital asset design and development, assembla, basecamp",
+          "abilities": "dedicated web and multimedia developer, hands-on experience with all aspects of project development life-cycle, excels at taking original designs and integrating them with back-end code to produce tight, responsive user interfaces, seeking to stay on the cutting edge of the fast moving and ever-changing realm of web development, authorized to work in the us for any employer",
+          "program": "ba in communication science and english",
+          "distance": 0.8160932064056396
+        },
+        {
+          "title": "front end web developer",
+          "skills": "html5, grunt, gulp, user interface, reactjs, css3, sass, content strategy, pixelmator, jquery, ajax, research, adobe cc, bootstrap, nodejs, amazon aws, typography, javascript, angularjs, google analytics, rest apis",
+          "abilities": "front end web developer, driven professional, create great-looking modern web apps, excellent communicator, passion for discovery, works on mobile or desktop",
+          "program": "m.s. in global affairs, b.a. in political science and business",
+          "distance": 0.8417612314224243
+        },
+        {
+          "title": "front- end developer",
+          "skills": "ajax, angularjs, api, aws, css",
+          "abilities": "single page application development, front- end development, full stack web development, building web applications, modern web, robust web applications, great user experience",
+          "program": "m.s. in software engineering, b.s. in software engineering",
+          "distance": 0.845106840133667
+        }
+      ]
+    },
+    {
+      "query_id": "query_17751",
+      "query_text": "Looking for a python developer with python 3.1x, django 1.4, and java and a background in bachelors in information science engineering.",
+      "category": "BE",
+      "target_person_id": "17751",
+      "difficulty": "standard",
+      "correct_count": 5,
+      "accuracy": 1.0,
+      "search_results": [
+        {
+          "title": "python developer",
+          "skills": "python, java, c, django framework",
+          "abilities": "python developer, linux (red hat), windows (7 and 8), git",
+          "program": "associates in business",
+          "distance": 0.5111362934112549
+        },
+        {
+          "title": "python developer",
+          "skills": "python, django, mysql, sql, database",
+          "abilities": "python developer, web development, software development, django, mysql, sql, database, object oriented programming, perl, data analysis, etl, reporting, mvc architecture, messaging system, data visualization, nosql, ssrs, ajax, ruby on rails, bootstrap, aws, rest, selenium, ood, sdlc, shell scripting, multi-threading",
+          "program": "bachelors in electronics and communication engineering",
+          "distance": 0.5302270650863647
+        },
+        {
+          "title": "python developer",
+          "skills": "python 2.7, django 1.4, html5, css, xml, mysql, javascript, backbone js, jquery, mongo db, ms sql server, git, github, aws, linux, shell scripting, ajax, java, python 2.6, 2.7, django framework 1.3, sql, lamp, adobe dreamweaver, apache web server, php, underscore js, sql developer tool, python, amazon aws s3, html, cassandra, django, pandas",
+          "abilities": "requirement gathering, project analysis, django development, python development, web development, database development, api development, automation, testing",
+          "program": "bachelor of engineer in engineer",
+          "distance": 0.5329307317733765
+        },
+        {
+          "title": "python developer, jr. python developer",
+          "skills": "python 3.x, django, sql, windows, linux, python, pandas, numpy, matplotlib, wireshark, windump, mysql",
+          "abilities": "data visualization, data exploring, statistical analysis on data, python developer, web developer in python, object oriented programming, gui with tkinter, mysql, socket programming, django web framework, agile methodology, scrum, analytical and problem-solving skills, multi-tasking and organizational skills, excellent communication and interpersonal skills",
+          "program": "masters in vlsi system design, bachelors ece, adca certificate",
+          "distance": 0.5350928902626038
+        },
+        {
+          "title": "sr. python developer, python developer",
+          "skills": "python, django, tastypie web framework, git, mysql, postgresql, aws, ec2, pycharm, selenium ide, html, css, javascript, ajax, web services, mongodb, flask, s3, sql workbench, sql server, html5, css3, json, jquery, scala, spark, hadoop, golang, angular js, soap, agile, sql, linux, gerrit, jenkins, oracle db, vmware api",
+          "abilities": "django, html, javascript, python, mysql",
+          "program": "bachelor's degree in aeronautical engineering",
+          "distance": 0.5404828190803528
+        }
+      ]
+    }
+  ]
+}

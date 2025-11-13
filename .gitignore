@@ -1,0 +1,9 @@
+# Database files
+chromadb_store/chroma.sqlite3
+*.sqlite3
+*.sqlite
+*.db
+
+# ChromaDB store directory (optional - uncomment if you want to ignore the entire directory)
+# chromadb_store/
+
