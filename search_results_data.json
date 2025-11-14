@@ -1,0 +1,137 @@
+[
+  {
+    "query_id": "query_10873",
+    "query_text": "Candidate for a systems engineer role, strong in onsite support, administration, and technology maintenance and educated in bachelor's in computer & network security.",
+    "category": "BE",
+    "target_person_id": "10873",
+    "difficulty": "standard",
+    "search_results": [
+      {
+        "title": "system engineer, it specialist, it support desktop, information security analyst, it security specialist, cyber security analyst",
+        "skills": "hbss, acas, tanium, nessus, database, tools qa, stig, sccm, oral communication, written communication, customer service, problem solving, computer installation, windows 7 to 10 upgrade, data backup, pc refresh, security surveillance, incident response, vulnerability assessment, patch management, technical documentation, server maintenance, risk assessment, security operations, security reporting, security protocol development, security training, software updates",
+        "abilities": "diligent it specialist, computer network defense, endpoint and intrusion analysis, network security monitoring, cyber attack prevention, collaborative and effective communication, excellent presentation skills, effective manager and team player, identify security risks, attention to detail, problem solving, c, matlab, python, linux centos, verilog, mysql, microsoft server administration, microsoft office suite, authorized to work in us, fast-paced environment, enthusiasm and adaptability, excellent time management",
+        "program": "master of science in cybersecurity technology, bachelor of science in computer network & cyber security",
+        "distance": 0.4948984384536743
+      },
+      {
+        "title": "network administrator, systems consultant, manager, site support engineer",
+        "skills": "network security, hardware troubleshooting, software troubleshooting, risk analysis, workflow efficiency, data migration, software and firmware updates, malware removal, user setup and configuration, disaster recovery, employee management, customer service, inventory management, safety and security, network maintenance, computer repair, troubleshooting, active directory management",
+        "abilities": "ethics, leadership, reliability, efficiency, responsibility, integrity, teamwork, knowledge, motivation",
+        "program": "bachelors of science in information systems security, associate of applied science in network systems administration, certificate",
+        "distance": 0.5008327960968018
+      },
+      {
+        "title": "graduate assistant (system administrator), network engineer, cyber, network security",
+        "skills": "software, hardware procurement, licensing & deployment, active directory & network management, web systems design & maintenance, livestream studio video production, monitored bandwidth and network activity, corrected networking connectivity issues, directed the configuration of data switches and routers, structural cables and vsat equipment terminations and installations team member, developed disaster recovery plans and managed daily backup and recovery, worked as a team member with other technical staff to ensure connectivity and compatibility between systems, conducted server security administration and compliance",
+        "abilities": "hard-working network/system administrator, detail-oriented and proactive with strong troubleshooting training, communication and analytical abilities, research and analytical skills of a graduate student, ability to strategize and lead in managerial positions",
+        "program": "msc, bsc in computer science/statistics, ond",
+        "distance": 0.5020630955696106
+      },
+      {
+        "title": "systems security engineer, senior analyst, it security, junior systems administrator",
+        "skills": "information security, penetration testing, exploit development, network security, incident response, vulnerability management, active directory, g suite, mobile device management",
+        "abilities": "penetration testing, exploit development, security engineering, incident response, vulnerability management, active directory, linux, windows",
+        "program": "bachelor's",
+        "distance": 0.5022884607315063
+      },
+      {
+        "title": "systems security analyst, sr. it security professional, sr. infrastructure engineer, systems & server engineer, systems server engineer",
+        "skills": "vmware, active directory, system administrator, sccm, linux",
+        "abilities": "systems engineer/architect/analyst, hardware, platform, and software solutions, agile business solutions, attention to detail, diligent work effort, organizational skills, prioritize competing objectives, preserve company's best interests, high customer satisfaction, motivated team player, contribute new ideas, solve business needs with emerging technology, improve current operations with fresh ideas, excellent work ethics",
+        "program": "associates degree in information technology",
+        "distance": 0.5081608295440674
+      }
+    ],
+    "timestamp": null
+  },
+  {
+    "query_id": "query_12097",
+    "query_text": "Looking for a software developer sr associate iii with cobol, database, and database systems and b.s. degree in cyber forensics and information security plus strong communication skills and a focus on continuous improvement.",
+    "category": "BE",
+    "target_person_id": "12097",
+    "difficulty": "hard",
+    "search_results": [
+      {
+        "title": "software developer sr associate iii, application developer associate ii, software engineer ii, software engineer i, it associate application developer, it security analyst internship",
+        "skills": "cobol, database, database systems, sql server, sql server 2008, sql, security, sharepoint, visual studio, c#, systems analysis, visual basic, ios, linux, endeavor, excel, ms excel, ms powerpoint, powerpoint, ms word, ssrs",
+        "abilities": "maintained cobol programs, led change initiatives, led project work, created documentation, created sql, provided production support, built and maintained sharepoint site, created stored procedures, coordinated requests and changes, conducted testing, managed turnover activities, developed applications, assisted with reports, facilitated training, conducted gap analysis, assisted in implementation",
+        "program": "b.s. degree in cyber forensics and information security",
+        "distance": 0.47940966486930847
+      },
+      {
+        "title": "cyber security analyst, freelance it consultant, systems engineer",
+        "skills": "comptia, cyber security, information security, linux, visio, apcon, gigamon, security analytics (solera), fidelis, fireeye, rsa archer, bro, zeek, snort, suricata, splunk, solarwinds, vsphere, active dire, weblogic, sql developer, service central, remedy, putty, windows remote desktop, ftk, windows, html, php, css, adobe, excel, inventory, powerpoint, mysql, sharepoint, training, technical writing, dreamweaver, data entry, forensics",
+        "abilities": "cyber security, analyst, specialist",
+        "program": "bachelor's in information technology - cyber security",
+        "distance": 0.6424856781959534
+      },
+      {
+        "title": "it security manager, security engineer, systems analyst",
+        "skills": "ids, incident response, firewall, linux, endpoint protection, active directory, cyber security, cloud security, senior management, microsoft windows, vulnerability management, siem, ips, vuln. scanner, email security, web proxy security, incident response management, forensics, application support, database support, custom reporting, mssql",
+        "abilities": "discover and remediate gaps in security, implement policy and procedures, adhere to nist and cobit, implement best practices and continuous improvement, implemented cyber security awareness program",
+        "program": "b.s. in criminal justice",
+        "distance": 0.6677125096321106
+      },
+      {
+        "title": "cyber security analyst, it support, it intern",
+        "skills": "sa&a document reviews, nist 800-53 rev a standards, poa&m management, palo alto firewall and ids, tenable network security and seim tool, daily security report, dreamweaver, sharepoint 2007, html, pdf files, student handbook, logos and web design, outlook, email support, computer setup and troubleshooting, icims hiring database, citrix remote desktop, router and wireless setup, wireshark packet tracer",
+        "abilities": "cyber security, it support, web development, network troubleshooting, linux and windows, microsoft office, adobe suite, databases, networking protocols, it internship",
+        "program": "bachelors in computer forensics",
+        "distance": 0.6724138855934143
+      },
+      {
+        "title": "sr. security analyst, cybersecurity analyst, project coordinator, manager, digital operations, associate consultant, it risk management",
+        "skills": "threat hunting, penetration testing, information security analyst, incident response, security engineering, threat actor monitoring, threat intelligence, red team exercises, forensics, documentation, tracking, digital technologies, infrastructure, strategic initiatives, communication, cross-functional collaboration, it risk management, hiring, onboarding, client engagement",
+        "abilities": "security analysis, penetration testing, threat hunting, threat intelligence, incident response, cyber forensics, security scripting, reporting & metrics, web application security, gwapt certified, gwapt capture the flag winner",
+        "program": "master's in software engineering, extension studies, bachelor of science in legal studies, business",
+        "distance": 0.692522406578064
+      }
+    ],
+    "timestamp": null
+  },
+  {
+    "query_id": "query_3701",
+    "query_text": "senior software engineer experienced in algolia, react.js, and redux.js and holding biology & neuroscience.",
+    "category": "BE",
+    "target_person_id": "3701",
+    "difficulty": "standard",
+    "search_results": [
+      {
+        "title": "senior front end developer, sr. ui developer, software developer, prof java, j2ee developer",
+        "skills": "react, ui, javascript, angular, front end",
+        "abilities": "react, ui, javascript, angular, front end",
+        "program": "master of computer science in computer science",
+        "distance": 0.6599366664886475
+      },
+      {
+        "title": "senior react js developer, reactjs developer, frond end developer, react js developer, front end developer, web developer",
+        "skills": "html5, css3, javascript, react js, redux, jsx, es6, state and props, jquery, jasmine, agile, ajax, git, ui, ux designs, npm, reactjs, bootstrap, mvc, html 5, css 3, mongodb, linux, typescript, json, dom, visual studio code, windows, sass, co-portal, publisher, adobe photoshop, github, cross browser, html, nodejs, http calls, restful api, mongoose",
+        "abilities": "bootstrap, html, html5, javascript, jquery",
+        "program": "master of science in computer science",
+        "distance": 0.6661090850830078
+      },
+      {
+        "title": "senior react native developer, senior front end software developer, senior web, ui developer, front end software developer, web software developer",
+        "skills": "react native, redux, reactjs, html5, css3, javascript, xcode, chrome developer tool, jira, git, agile, visual studio code, sass, wcag 2.0 level aa, bootstrap, media queries, webpack, restful, webstorm, html, css, angularjs, jquery, ajax, sublime",
+        "abilities": "over 6 years of experience in front-end application development, expert at reactjs and redux, hands-on experience in building responsive web application, solid foundation in html and javascript, expert at creating page layouts by css3 pre-processor frameworks, hands-on experience in websites developing technologies and frameworks, expert at dom manipulation with javascript/jquery, expert at xcode ios simulator and android studio emulator, professional experience in the ecmascript new standard features, professional experience in developing curd application, hands-on experience in restful web services, expert in developer toolbar for chrome and redux developer tool, strong knowledge of cross-browser compatibility and w3c standards, knowledge about cucumber language for writing test cases, expert at running unit test using jest and enzyme, involve in the phase of software development life cycles, hands-on experience in using different kinds of ide's, professional experience in using version control tools git, wide experience with communication software such as teams and slack, excellent self-motivated team worker, capable of working under pressure and good multi-tasks management",
+        "program": "master of science in computer engineering, bachelor of engineering in electrical engineering",
+        "distance": 0.6716764569282532
+      },
+      {
+        "title": "senior react js developer, reactjs developer, frond end developer, react js developer, front end developer, web developer",
+        "skills": "html5, css3, javascript, react js, redux, jsx, es6, state and props, jquery, jasmine, agile, ajax, git, ui, ux designs, npm, reactjs, bootstrap, mvc, html 5, css 3, mongodb, linux, typescript, json, dom, visual studio code, windows, sass, co-portal, publisher, adobe photoshop, github, cross browser, html, nodejs, http calls, restful api, mongoose",
+        "abilities": "git, html, javascript, bootstrap, redux, typescript, json, vs code, scripting, html5, sass, eclipse, jquery, ajax, css, dreamweaver, database, mysql, mongodb, linux",
+        "program": "master of science in computer science",
+        "distance": 0.6844847202301025
+      },
+      {
+        "title": "front end engineer, software engineer, react-native typescript engineer, software developer, react-native engineer, ruby-on-rails engineer",
+        "skills": "react-native, typescript, tealium, calabash, gherkin, realm.js, ruby on rails, react.js",
+        "abilities": "react-native, redux, maven, drupal, github, python/flack, django, sql, postgres, mongodb, ruby on rails, calabash, cucumber, javascript, typescript, backbone, react, rspec, capybara, selenium",
+        "program": "bachelor of arts in philosophy & religion",
+        "distance": 0.6868088245391846
+      }
+    ],
+    "timestamp": null
+  }
+]

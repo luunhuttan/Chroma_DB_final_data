@@ -18,6 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent
 QUERIES_FILE = BASE_DIR / "random_queries.csv"
 PROGRESS_FILE = BASE_DIR / "progress_final_data.json"
 RESULTS_FILE = BASE_DIR / "final_results.json"
+SEARCH_RESULTS_FILE = BASE_DIR / "search_results_data.json"  # File lưu kết quả tìm kiếm để đánh giá
 COLLECTION_NAME = "qa_collection"
 BATCH_SIZE = 20  # Số lượng queries xử lý mỗi lần chạy
 
@@ -94,6 +95,20 @@ def save_results(results: List[Dict[str, Any]]):
         json.dump(results, f, ensure_ascii=False, indent=2)
 
 
+def load_search_results() -> List[Dict[str, Any]]:
+    """Tải kết quả tìm kiếm đã lưu (nếu có)."""
+    if SEARCH_RESULTS_FILE.exists():
+        with SEARCH_RESULTS_FILE.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    return []
+
+
+def save_search_results(search_results_data: List[Dict[str, Any]]):
+    """Lưu kết quả tìm kiếm vào file để đánh giá."""
+    with SEARCH_RESULTS_FILE.open("w", encoding="utf-8") as f:
+        json.dump(search_results_data, f, ensure_ascii=False, indent=2)
+
+
 def display_results(results: List[Dict[str, Any]], query_info: Dict[str, str]):
     """Hiển thị kết quả tìm kiếm cho người dùng."""
     print("\n" + "="*80)
@@ -140,6 +155,9 @@ def process_queries():
     start_index = progress["last_processed_index"]
     results = progress["results"]
     
+    # Tải kết quả tìm kiếm đã lưu
+    search_results_data = load_search_results()
+    
     print(f"\nTiếp tục từ query thứ {start_index + 1} (đã xử lý {len(results)} queries)")
     
     # Xác định số queries cần xử lý trong batch này
@@ -162,6 +180,25 @@ def process_queries():
         # Tìm kiếm
         search_results = search_top5(query_text)
         
+        # Lưu kết quả tìm kiếm vào file để đánh giá
+        search_result_entry = {
+            "query_id": query_info["query_id"],
+            "query_text": query_text,
+            "category": query_info["category"],
+            "target_person_id": query_info["target_person_id"],
+            "difficulty": query_info["difficulty"],
+            "search_results": search_results,
+            "timestamp": None  # Có thể thêm timestamp nếu cần
+        }
+        # Kiểm tra xem query_id đã tồn tại chưa (tránh trùng lặp khi tiếp tục)
+        existing_idx = next((i for i, item in enumerate(search_results_data) 
+                            if item.get("query_id") == query_info["query_id"]), None)
+        if existing_idx is not None:
+            search_results_data[existing_idx] = search_result_entry
+        else:
+            search_results_data.append(search_result_entry)
+        save_search_results(search_results_data)
+        
         if not search_results:
             print("Không tìm thấy kết quả nào!")
             correct_count = 0
@@ -179,6 +216,7 @@ def process_queries():
                 progress["results"] = results
                 save_progress(progress)
                 print(f"Đã lưu progress. Đã xử lý {len(results)} queries.")
+                print(f"Đã lưu kết quả tìm kiếm vào: {SEARCH_RESULTS_FILE}")
                 return
             
             # Tính accuracy
@@ -203,6 +241,7 @@ def process_queries():
         save_progress(progress)
         
         print(f"✓ Đã lưu. Accuracy: {accuracy:.2%} ({correct_count}/5)")
+        print(f"✓ Đã lưu kết quả tìm kiếm vào file: {SEARCH_RESULTS_FILE.name}")
     
     # Kiểm tra xem đã xử lý hết chưa
     if end_index >= len(all_queries):
@@ -248,6 +287,7 @@ def process_queries():
         # Lưu kết quả cuối cùng
         save_results(results)
         print(f"\nĐã lưu kết quả vào: {RESULTS_FILE}")
+        print(f"Đã lưu kết quả tìm kiếm để đánh giá vào: {SEARCH_RESULTS_FILE}")
         
         # Xóa file progress vì đã xong
         if PROGRESS_FILE.exists():
