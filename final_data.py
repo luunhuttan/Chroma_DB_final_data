@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Script đánh giá độ chính xác của hệ thống tìm kiếm
-- Đọc queries từ random_queries.csv
-- Chạy search_top5 cho mỗi query
-- Tính Precision@K, AP@K, MAP@K dựa trên distance hoặc relevance score
-- Lưu progress để có thể tiếp tục sau
+Script đánh giá độ chính xác của hệ thống tìm kiếm semantic với ChromaDB
+
+Chức năng:
+- Đọc các câu truy vấn từ file CSV
+- Tìm kiếm top 5 hồ sơ phù hợp nhất cho mỗi query
+- Tính các chỉ số đánh giá (Precision@K, AP@K, MAP@K)
+- Lưu tiến trình để có thể tiếp tục sau khi dừng
 """
 import csv
 import json
@@ -14,52 +16,90 @@ from typing import List, Dict, Any, Optional
 from sentence_transformers import SentenceTransformer
 import chromadb
 
-BASE_DIR = Path(__file__).resolve().parent
-QUERIES_FILE = BASE_DIR / "random_queries.csv"
-PROGRESS_FILE = BASE_DIR / "progress_final_data.json"
-RESULTS_FILE = BASE_DIR / "final_results.json"
-SEARCH_RESULTS_FILE = BASE_DIR / "search_results_data.json"  # File lưu kết quả tìm kiếm để đánh giá
-COLLECTION_NAME = "qa_collection"
-BATCH_SIZE = 20  # Số lượng queries xử lý mỗi lần chạy
-AUTO_EVALUATION = True  # True = tự động đánh giá, False = đánh giá thủ công
-EVALUATION_METHOD = "distance"  # "distance" hoặc "relevance"
-DISTANCE_THRESHOLD = 0.8  # Nếu dùng distance: distance < 0.8 → relevant
-RELEVANCE_THRESHOLD = 0.5  # Nếu dùng relevance: score >= 0.5 → relevant
+# ============================================================================
+# CẤU HÌNH
+# ============================================================================
 
-# Khởi tạo ChromaDB client và collection
+BASE_DIR = Path(__file__).resolve().parent
+
+# Các file cần dùng
+QUERIES_FILE = BASE_DIR / "random_queries.csv"              # File chứa queries
+PROGRESS_FILE = BASE_DIR / "progress_final_data.json"       # File lưu tiến trình
+RESULTS_FILE = BASE_DIR / "final_results.json"              # File kết quả cuối cùng
+SEARCH_RESULTS_FILE = BASE_DIR / "search_results_data.json" # File lưu kết quả tìm kiếm
+
+COLLECTION_NAME = "qa_collection"  # Tên collection trong ChromaDB
+
+# Cấu hình
+BATCH_SIZE = 20  # Xử lý 20 queries mỗi lần chạy
+AUTO_EVALUATION = True  # Tự động đánh giá (True) hoặc thủ công (False)
+EVALUATION_METHOD = "distance"  # Cách đánh giá: "distance" hoặc "relevance"
+DISTANCE_THRESHOLD = 0.8  # Nếu distance < 0.8 thì coi là phù hợp
+RELEVANCE_THRESHOLD = 0.5  # Nếu relevance score >= 0.5 thì coi là phù hợp
+
+# Kết nối ChromaDB và khởi tạo model
 client = chromadb.PersistentClient(path=str(BASE_DIR / "chromadb_store"))
 collection = client.get_or_create_collection(name=COLLECTION_NAME)
+model = SentenceTransformer('all-MiniLM-L6-v2')  # Model để chuyển text thành vector
 
-# Khởi tạo model embedding
-model = SentenceTransformer('all-MiniLM-L6-v2')
 
+# ============================================================================
+# HÀM TÌM KIẾM
+# ============================================================================
 
 def search_top5(query: str) -> List[Dict[str, Any]]:
-    """Trả về tối đa 5 hồ sơ phù hợp nhất với truy vấn."""
+    """
+    Tìm kiếm top 5 hồ sơ phù hợp nhất với query.
+    
+    Cách hoạt động:
+    1. Chuyển query thành vector (embedding) - vector này biểu diễn ngữ nghĩa của câu
+    2. So sánh vector này với tất cả vector của hồ sơ trong database
+    3. Lấy 5 hồ sơ có distance nhỏ nhất (tức là giống nhất về mặt ngữ nghĩa)
+    """
+    # Bước 1: Chuyển query thành vector (embedding)
+    # Model SentenceTransformer sẽ chuyển text thành một mảng số (vector)
+    # Ví dụ: "Python developer" → [0.1, -0.3, 0.5, ...] (384 số)
+    # Các câu có nghĩa giống nhau sẽ có vector gần giống nhau
     q_emb = model.encode([query], convert_to_tensor=False)[0].tolist()
+    
+    # Bước 2: Tìm kiếm trong ChromaDB
+    # ChromaDB sẽ tính khoảng cách (distance) giữa vector query và tất cả vector hồ sơ
+    # Distance càng nhỏ = càng giống nhau về mặt ngữ nghĩa
+    # Trả về 5 hồ sơ có distance nhỏ nhất (giống nhất)
     results = collection.query(
-        query_embeddings=[q_emb],
-        n_results=5,
-        include=["metadatas", "distances"],
+        query_embeddings=[q_emb],  # Vector của query để so sánh
+        n_results=5,               # Chỉ lấy 5 kết quả tốt nhất
+        include=["metadatas", "distances"],  # Cần metadata (thông tin hồ sơ) và distances (độ tương đồng)
     )
+    
+    # Bước 3: Xử lý kết quả trả về từ ChromaDB
+    # ChromaDB trả về dữ liệu dạng nested list, cần lấy phần tử đầu tiên
     items: List[Dict[str, Any]] = []
-    metas_list = (results.get("metadatas") or [[]])[0]
-    distance_list = (results.get("distances") or [[]])[0]
-    # ids luôn được trả về trong response, không cần include
-    ids_list = (results.get("ids") or [[]])[0]
+    metas_list = (results.get("metadatas") or [[]])[0]      # Thông tin chi tiết của từng hồ sơ
+    distance_list = (results.get("distances") or [[]])[0]    # Độ tương đồng (càng nhỏ càng giống)
+    ids_list = (results.get("ids") or [[]])[0]              # ID của từng hồ sơ
+    
+    # Bước 4: Tạo danh sách kết quả với đầy đủ thông tin
+    # Duyệt qua từng kết quả và lấy thông tin cần thiết
     for idx, meta in enumerate(metas_list):
         distance = distance_list[idx] if idx < len(distance_list) else None
         person_id = ids_list[idx] if idx < len(ids_list) else None
+        
+        # Tạo dictionary chứa thông tin đầy đủ của hồ sơ
         items.append({
-            "person_id": person_id,
-            "title": meta.get("title", ""),
-            "skills": meta.get("skills", ""),
-            "abilities": meta.get("abilities", ""),
-            "program": meta.get("program", ""),
-            "distance": distance,
+            "person_id": person_id,        # ID của người
+            "title": meta.get("title", ""),        # Chức danh/vai trò công việc
+            "skills": meta.get("skills", ""),      # Kỹ năng (ví dụ: Python, Java, SQL)
+            "abilities": meta.get("abilities", ""), # Khả năng (ví dụ: teamwork, leadership)
+            "program": meta.get("program", ""),     # Bằng cấp/chương trình học
+            "distance": distance,                   # Độ tương đồng: càng nhỏ càng giống query
         })
     return items
 
+
+# ============================================================================
+# HÀM ĐỌC/GHI FILE
+# ============================================================================
 
 def load_queries() -> List[Dict[str, str]]:
     """Đọc tất cả queries từ file CSV."""
@@ -81,7 +121,7 @@ def load_queries() -> List[Dict[str, str]]:
 
 
 def load_progress() -> Dict[str, Any]:
-    """Tải progress đã lưu (nếu có)."""
+    """Tải tiến trình đã lưu (nếu có) để tiếp tục từ nơi đã dừng."""
     if PROGRESS_FILE.exists():
         with PROGRESS_FILE.open("r", encoding="utf-8") as f:
             return json.load(f)
@@ -92,7 +132,7 @@ def load_progress() -> Dict[str, Any]:
 
 
 def save_progress(progress: Dict[str, Any]):
-    """Lưu progress vào file."""
+    """Lưu tiến trình vào file để có thể tiếp tục sau."""
     with PROGRESS_FILE.open("w", encoding="utf-8") as f:
         json.dump(progress, f, ensure_ascii=False, indent=2)
 
@@ -104,7 +144,7 @@ def save_results(results: List[Dict[str, Any]]):
 
 
 def load_search_results() -> List[Dict[str, Any]]:
-    """Tải kết quả tìm kiếm đã lưu (nếu có)."""
+    """Tải kết quả tìm kiếm đã lưu."""
     if SEARCH_RESULTS_FILE.exists():
         with SEARCH_RESULTS_FILE.open("r", encoding="utf-8") as f:
             return json.load(f)
@@ -112,7 +152,7 @@ def load_search_results() -> List[Dict[str, Any]]:
 
 
 def save_search_results(search_results_data: List[Dict[str, Any]]):
-    """Lưu kết quả tìm kiếm vào file để đánh giá."""
+    """Lưu kết quả tìm kiếm vào file."""
     with SEARCH_RESULTS_FILE.open("w", encoding="utf-8") as f:
         json.dump(search_results_data, f, ensure_ascii=False, indent=2)
 
@@ -220,90 +260,149 @@ def display_results(results: List[Dict[str, Any]], query_info: Dict[str, str], q
     print("\n" + "="*80)
 
 
+# ============================================================================
+# HÀM XỬ LÝ TEXT VÀ TÍNH RELEVANCE
+# ============================================================================
+
 def extract_keywords(text: str) -> set:
-    """Trích xuất keywords từ text (loại bỏ stop words đơn giản)."""
-    # Chuyển thành lowercase và tách thành từ
+    """
+    Trích xuất từ khóa từ text, bỏ qua các từ không quan trọng.
+    
+    Ví dụ: "Looking for a Python developer" → {"looking", "python", "developer"}
+    """
+    # Tách text thành các từ
     words = re.findall(r'\b\w+\b', text.lower())
-    # Loại bỏ các từ quá ngắn (< 3 ký tự) và các từ thường gặp
-    stop_words = {'the', 'for', 'and', 'with', 'in', 'on', 'at', 'to', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'of', 'from', 'by', 'as', 'or', 'but', 'not', 'this', 'that', 'these', 'those'}
+    
+    # Loại bỏ các từ không quan trọng (từ ngắn và từ thường gặp)
+    stop_words = {'the', 'for', 'and', 'with', 'in', 'on', 'at', 'to', 'a', 'an', 
+                  'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 
+                  'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 
+                  'may', 'might', 'must', 'can', 'of', 'from', 'by', 'as', 'or', 
+                  'but', 'not', 'this', 'that', 'these', 'those'}
+    
+    # Chỉ giữ lại từ có ý nghĩa (dài hơn 2 ký tự và không phải stop word)
     keywords = {w for w in words if len(w) >= 3 and w not in stop_words}
     return keywords
 
 
 def calculate_relevance_score(query: str, result: Dict[str, Any]) -> float:
     """
-    Tính điểm relevance (0-1) dựa trên:
-    1. Distance (semantic similarity) - 40%
-    2. Keyword matching trong title - 20%
-    3. Keyword matching trong skills - 25%
-    4. Keyword matching trong abilities - 15%
+    Tính điểm phù hợp (0-1) của một kết quả với query.
+    
+    Điểm được tính từ 4 yếu tố:
+    - 40%: Độ tương đồng ngữ nghĩa (distance) - đánh giá bằng embedding
+    - 20%: Từ khóa khớp trong chức danh (title)
+    - 25%: Từ khóa khớp trong kỹ năng (skills) - quan trọng nhất
+    - 15%: Từ khóa khớp trong khả năng (abilities)
+    
+    Ví dụ: Query "Python developer" với hồ sơ có skills "Python, Django"
+    → Skills match cao → điểm relevance cao
     """
     score = 0.0
     
-    # 1. Distance score (càng nhỏ càng tốt, normalize về 0-1)
+    # Phần 1: Điểm từ độ tương đồng ngữ nghĩa (40%)
+    # Distance là khoảng cách giữa vector query và vector hồ sơ
+    # Distance thường trong khoảng 0-2:
+    #   - 0 = giống hoàn toàn
+    #   - 2 = khác biệt hoàn toàn
     distance = result.get('distance')
     if distance is not None:
-        # Distance thường trong khoảng 0-2, normalize
-        # Distance nhỏ = similarity cao
-        distance_score = max(0, 1 - (distance / 2.0))  # Nếu distance = 0 -> score = 1, distance = 2 -> score = 0
-        score += distance_score * 0.4
+        # Chuyển distance (0-2) thành điểm (1-0)
+        # distance = 0 → score = 1 (giống hoàn toàn)
+        # distance = 1 → score = 0.5 (giống một nửa)
+        # distance = 2 → score = 0 (khác biệt hoàn toàn)
+        distance_score = max(0, 1 - (distance / 2.0))
+        score += distance_score * 0.4  # Chiếm 40% tổng điểm
     
-    # 2-4. Keyword matching
+    # Phần 2-4: Điểm từ từ khóa khớp (60% còn lại)
+    # Trích xuất từ khóa từ query (bỏ qua các từ không quan trọng như "the", "a", "for")
     query_keywords = extract_keywords(query)
+    # Ví dụ: "Looking for a Python developer" → {"looking", "python", "developer"}
     
-    # Title matching (20%)
+    # So khớp trong chức danh (20%)
+    # Ví dụ: Query có "developer" và hồ sơ có title "Senior Developer" → khớp
     title = result.get('title', '').lower()
     title_keywords = extract_keywords(title)
+    # Tính tỷ lệ: số từ khóa chung / tổng số từ khóa trong query
+    # Ví dụ: query có 3 từ khóa, title có 1 từ khóa chung → match = 1/3 = 0.33
     title_match = len(query_keywords & title_keywords) / max(len(query_keywords), 1)
     score += title_match * 0.2
     
-    # Skills matching (25%)
+    # So khớp trong kỹ năng (25% - quan trọng nhất)
+    # Ví dụ: Query có "Python" và hồ sơ có skills "Python, Django, SQL" → khớp
     skills = result.get('skills', '').lower()
     skills_keywords = extract_keywords(skills)
     skills_match = len(query_keywords & skills_keywords) / max(len(query_keywords), 1)
-    score += skills_match * 0.25
+    score += skills_match * 0.25  # Chiếm 25% - quan trọng nhất vì skills là yêu cầu chính
     
-    # Abilities matching (15%)
+    # So khớp trong khả năng (15%)
+    # Ví dụ: Query có "leadership" và hồ sơ có abilities "leadership, communication" → khớp
     abilities = result.get('abilities', '').lower()
     abilities_keywords = extract_keywords(abilities)
     abilities_match = len(query_keywords & abilities_keywords) / max(len(query_keywords), 1)
     score += abilities_match * 0.15
     
+    # Đảm bảo điểm không vượt quá 1.0 (tối đa 100%)
     return min(1.0, score)
 
+
+# ============================================================================
+# HÀM TÍNH METRICS ĐÁNH GIÁ
+# ============================================================================
 
 def get_relevance_labels(results: List[Dict[str, Any]], query: str, 
                          method: str = "distance", threshold: float = 0.8) -> List[int]:
     """
-    Xác định relevance label (0 hoặc 1) cho mỗi kết quả.
+    Xác định kết quả nào phù hợp (1) và không phù hợp (0).
     
-    Args:
-        results: List of search results
-        query: Query text (để tính relevance score nếu method="relevance")
-        method: "distance" (chỉ dùng distance) hoặc "relevance" (dùng relevance score)
-        threshold: 
-            - Nếu method="distance": distance threshold (càng nhỏ càng tốt, thường 0.6-1.0)
-            - Nếu method="relevance": relevance score threshold (0-1, càng cao càng tốt)
+    Có 2 phương pháp đánh giá:
+    
+    1. "distance" (mặc định):
+       - Chỉ dựa vào độ tương đồng ngữ nghĩa (embedding)
+       - Nếu distance < threshold → phù hợp (1)
+       - Ví dụ: threshold = 0.8, distance = 0.6 → phù hợp (0.6 < 0.8)
+       - Ưu điểm: Nhanh, đơn giản
+       - Nhược điểm: Có thể bỏ sót kết quả phù hợp về từ khóa nhưng khác về ngữ nghĩa
+    
+    2. "relevance":
+       - Kết hợp distance (40%) + keyword matching (60%)
+       - Nếu relevance score >= threshold → phù hợp (1)
+       - Ví dụ: threshold = 0.5, score = 0.7 → phù hợp (0.7 >= 0.5)
+       - Ưu điểm: Chính xác hơn, xem xét cả từ khóa
+       - Nhược điểm: Chậm hơn vì phải tính relevance score
     
     Returns:
-        List of binary relevance labels [0, 1, 0, 1, ...]
+        List nhãn binary [0, 1, 0, 1, ...] tương ứng với từng kết quả
+        - 1 = phù hợp (relevant)
+        - 0 = không phù hợp (non-relevant)
     """
     labels = []
     
+    # Duyệt qua từng kết quả tìm kiếm
     for result in results:
         is_relevant = False
         
         if method == "distance":
-            # Chỉ dùng distance: distance càng nhỏ = càng giống = càng phù hợp
+            # Phương pháp 1: Chỉ dùng distance
+            # Distance là khoảng cách giữa vector query và vector hồ sơ
+            # Distance càng nhỏ = càng giống nhau về mặt ngữ nghĩa = càng phù hợp
             distance = result.get('distance')
             if distance is not None:
-                # Distance < threshold → relevant
+                # Nếu distance nhỏ hơn ngưỡng → kết quả này phù hợp
+                # Ví dụ: threshold = 0.8, distance = 0.6 → 0.6 < 0.8 → phù hợp
                 is_relevant = distance < threshold
+                
         elif method == "relevance":
-            # Dùng relevance score (kết hợp distance + keyword matching)
+            # Phương pháp 2: Dùng relevance score (kết hợp distance + keywords)
+            # Relevance score được tính từ:
+            # - 40% distance (độ tương đồng ngữ nghĩa)
+            # - 60% keyword matching (từ khóa khớp trong title, skills, abilities)
             score = calculate_relevance_score(query, result)
+            # Nếu score lớn hơn hoặc bằng ngưỡng → kết quả này phù hợp
+            # Ví dụ: threshold = 0.5, score = 0.7 → 0.7 >= 0.5 → phù hợp
             is_relevant = score >= threshold
         
+        # Chuyển đổi thành nhãn binary: 1 = phù hợp, 0 = không phù hợp
         labels.append(1 if is_relevant else 0)
     
     return labels
@@ -311,39 +410,56 @@ def get_relevance_labels(results: List[Dict[str, Any]], query: str,
 
 def precision_at_k(relevance_labels: List[int], k: int) -> float:
     """
-    Tính Precision@K.
+    Tính Precision@K - Tỷ lệ kết quả phù hợp trong top K.
     
-    Args:
-        relevance_labels: List of binary relevance labels [0, 1, 0, 1, ...]
-        k: Số kết quả đầu tiên cần xem xét
+    Công thức: Precision@K = (Số kết quả phù hợp trong top K) / K
     
-    Returns:
-        Precision@K (0.0 - 1.0)
+    Ví dụ: 
+    - labels = [1, 1, 0, 1, 0] (5 kết quả, 3 phù hợp)
+    - Precision@5 = 3/5 = 0.6 (60% kết quả phù hợp)
+    - Precision@5 = 1.0 nghĩa là tất cả 5 kết quả đều phù hợp (hoàn hảo)
+    
+    Precision@K càng cao → hệ thống càng chính xác
     """
     if k == 0:
         return 0.0
     
+    # Lấy k nhãn đầu tiên (top K kết quả)
     top_k_labels = relevance_labels[:k]
     if not top_k_labels:
         return 0.0
     
+    # Đếm số kết quả phù hợp (nhãn = 1)
+    # Ví dụ: [1, 1, 0, 1, 0] → sum = 3
     relevant_count = sum(top_k_labels)
+    
+    # Tính tỷ lệ: số phù hợp / tổng số kết quả
     return relevant_count / len(top_k_labels)
 
 
 def average_precision_at_k(relevance_labels: List[int], k: int) -> float:
     """
-    Tính Average Precision@K (AP@K).
+    Tính AP@K (Average Precision@K) - Đánh giá chất lượng thứ tự sắp xếp.
     
-    AP@K = (1/R) * sum(P@i for i where result i is relevant)
-    R = tổng số kết quả relevant trong top K
+    AP@K khác với Precision@K ở chỗ:
+    - Precision@K: Chỉ quan tâm có bao nhiêu kết quả phù hợp
+    - AP@K: Quan tâm cả vị trí của các kết quả phù hợp
     
-    Args:
-        relevance_labels: List of binary relevance labels
-        k: Số kết quả đầu tiên cần xem xét
+    Nếu kết quả phù hợp được xếp ở vị trí cao (1, 2, 3) → AP@K cao
+    Nếu kết quả phù hợp bị xếp ở vị trí thấp (4, 5) → AP@K thấp
     
-    Returns:
-        AP@K (0.0 - 1.0)
+    Công thức: AP@K = (1/R) * Σ(P@i cho mỗi vị trí i có kết quả phù hợp)
+    R = tổng số kết quả phù hợp trong top K
+    
+    Ví dụ chi tiết với labels = [1, 1, 0, 1, 0]:
+    - Vị trí 1: phù hợp (1) → P@1 = 1/1 = 1.0 (có 1 phù hợp trong 1 kết quả đầu)
+    - Vị trí 2: phù hợp (1) → P@2 = 2/2 = 1.0 (có 2 phù hợp trong 2 kết quả đầu)
+    - Vị trí 3: không phù hợp (0) → bỏ qua
+    - Vị trí 4: phù hợp (1) → P@4 = 3/4 = 0.75 (có 3 phù hợp trong 4 kết quả đầu)
+    - Vị trí 5: không phù hợp (0) → bỏ qua
+    
+    AP@5 = (1.0 + 1.0 + 0.75) / 3 = 0.917
+    → Điểm cao vì các kết quả phù hợp được xếp ở vị trí cao
     """
     if k == 0:
         return 0.0
@@ -352,53 +468,72 @@ def average_precision_at_k(relevance_labels: List[int], k: int) -> float:
     if not top_k_labels:
         return 0.0
     
-    # Tổng số kết quả relevant trong top K
+    # Đếm tổng số kết quả phù hợp trong top K
     total_relevant = sum(top_k_labels)
     if total_relevant == 0:
-        return 0.0
+        return 0.0  # Không có kết quả phù hợp nào → AP@K = 0
     
-    # Tính precision tại mỗi vị trí có kết quả relevant
+    # Tính precision tại mỗi vị trí có kết quả phù hợp
     ap_sum = 0.0
-    relevant_found = 0
+    relevant_found = 0  # Số lượng kết quả phù hợp đã tìm thấy từ đầu đến vị trí hiện tại
     
-    for i, label in enumerate(top_k_labels, 1):
-        if label == 1:  # Kết quả này là relevant
-            relevant_found += 1
-            # Precision tại vị trí i = số relevant từ đầu đến i / i
+    # Duyệt qua từng vị trí trong top K
+    for i, label in enumerate(top_k_labels, 1):  # i bắt đầu từ 1 (vị trí 1, 2, 3, ...)
+        if label == 1:  # Nếu kết quả ở vị trí i là phù hợp
+            relevant_found += 1  # Tăng số lượng phù hợp đã tìm thấy
+            # Tính precision tại vị trí i
+            # Precision@i = số phù hợp từ đầu đến vị trí i / vị trí i
             precision_at_i = relevant_found / i
-            ap_sum += precision_at_i
+            ap_sum += precision_at_i  # Cộng dồn vào tổng
     
+    # Trung bình: tổng precision / số lượng kết quả phù hợp
     return ap_sum / total_relevant
 
 
 def calculate_metrics(results: List[Dict[str, Any]], query: str,
                      k: int = 5, method: str = "distance", threshold: float = 0.8) -> Dict[str, float]:
     """
-    Tính các metrics: Precision@K, AP@K.
-    Đánh giá dựa trên distance hoặc relevance score.
+    Tính các chỉ số đánh giá: Precision@K và AP@K.
+    
+    Quy trình:
+    1. Xác định kết quả nào phù hợp (relevant) và không phù hợp (non-relevant)
+    2. Tính Precision@K: Tỷ lệ kết quả phù hợp trong top K
+    3. Tính AP@K: Đánh giá chất lượng thứ tự sắp xếp
     
     Args:
-        results: List of search results
-        query: Query text (để tính relevance score nếu method="relevance")
-        k: Số kết quả đầu tiên (mặc định 5)
-        method: "distance" (chỉ dùng distance) hoặc "relevance" (dùng relevance score)
-        threshold: 
-            - Nếu method="distance": distance threshold (thường 0.6-1.0)
-            - Nếu method="relevance": relevance score threshold (0-1)
+        results: Danh sách 5 kết quả tìm kiếm
+        query: Câu truy vấn
+        k: Số kết quả đầu tiên (thường là 5)
+        method: "distance" hoặc "relevance"
+        threshold: Ngưỡng để xác định phù hợp
     
     Returns:
-        Dict chứa các metrics
+        Dictionary chứa:
+        - precision_at_k: Precision@K (0.0 - 1.0)
+        - ap_at_k: Average Precision@K (0.0 - 1.0)
+        - relevance_labels: [0, 1, 0, 1, ...] - nhãn của từng kết quả
+        - num_relevant: Số lượng kết quả phù hợp (0-5)
     """
+    # Bước 1: Xác định kết quả nào phù hợp
+    # Chuyển đổi mỗi kết quả thành nhãn binary: 1 = phù hợp, 0 = không phù hợp
+    # Ví dụ: [1, 1, 0, 1, 0] nghĩa là kết quả 1, 2, 4 phù hợp; kết quả 3, 5 không phù hợp
     relevance_labels = get_relevance_labels(results, query, method, threshold)
     
+    # Bước 2: Tính Precision@K
+    # Precision@K = số kết quả phù hợp / tổng số kết quả
+    # Ví dụ: [1, 1, 0, 1, 0] → 3 phù hợp / 5 tổng = 0.6
     p_at_k = precision_at_k(relevance_labels, k)
+    
+    # Bước 3: Tính AP@K
+    # AP@K đánh giá chất lượng thứ tự: kết quả phù hợp ở vị trí cao → AP@K cao
+    # Ví dụ: [1, 1, 0, 1, 0] → AP@5 = 0.917 (các kết quả phù hợp ở vị trí 1, 2, 4)
     ap_at_k = average_precision_at_k(relevance_labels, k)
     
     return {
-        'precision_at_k': p_at_k,
-        'ap_at_k': ap_at_k,
-        'relevance_labels': relevance_labels,
-        'num_relevant': sum(relevance_labels)
+        'precision_at_k': p_at_k,              # Precision@K
+        'ap_at_k': ap_at_k,                    # Average Precision@K
+        'relevance_labels': relevance_labels,   # Nhãn binary [0, 1, 0, 1, ...]
+        'num_relevant': sum(relevance_labels)  # Số lượng kết quả phù hợp
     }
 
 
@@ -531,19 +666,29 @@ def get_correct_count(query: str, results: List[Dict[str, Any]], auto_mode: bool
                 print("⚠️  Vui lòng nhập một số hợp lệ!")
 
 
+# ============================================================================
+# HÀM CHÍNH XỬ LÝ QUERIES
+# ============================================================================
+
 def process_queries():
-    """Xử lý queries từ file CSV."""
+    """
+    Hàm chính xử lý tất cả queries.
+    
+    Quy trình:
+    1. Đọc queries từ file
+    2. Tải tiến trình đã lưu (nếu có)
+    3. Xử lý từng query: tìm kiếm → tính metrics → lưu kết quả
+    4. Tính thống kê tổng hợp khi xong
+    """
     # Đọc queries
     print("Đang đọc queries từ file...")
     all_queries = load_queries()
     print(f"Tổng số queries: {len(all_queries)}")
     
-    # Tải progress
+    # Tải tiến trình đã lưu để tiếp tục
     progress = load_progress()
     start_index = progress["last_processed_index"]
     results = progress["results"]
-    
-    # Tải kết quả tìm kiếm đã lưu
     search_results_data = load_search_results()
     
     print(f"\nTiếp tục từ query thứ {start_index + 1} (đã xử lý {len(results)} queries)")
@@ -555,64 +700,81 @@ def process_queries():
     print(f"Sẽ xử lý {len(queries_to_process)} queries (từ {start_index + 1} đến {end_index})")
     print(f"Bạn có thể nhập 'exit' hoặc 'quit' bất cứ lúc nào để dừng và lưu progress\n")
     
-    # Xử lý từng query
+    # Xử lý từng query trong batch
     for idx, query_info in enumerate(queries_to_process, start=start_index):
+        # Lấy nội dung query (câu truy vấn)
         query_text = query_info["query_text"]
         
+        # Bỏ qua nếu query rỗng
         if not query_text.strip():
             print(f"\nQuery {idx + 1} bỏ qua (query_text rỗng)")
             continue
         
         print(f"\n[{idx + 1}/{len(all_queries)}] Đang xử lý query...")
         
-        # Tìm kiếm
+        # Bước 1: Tìm kiếm top 5 hồ sơ phù hợp nhất
+        # Hàm này sẽ:
+        # - Chuyển query thành vector (embedding)
+        # - So sánh với tất cả hồ sơ trong database
+        # - Trả về 5 hồ sơ có distance nhỏ nhất (giống nhất)
         search_results = search_top5(query_text)
         
-        # Lưu kết quả tìm kiếm vào file để đánh giá
+        # Bước 2: Lưu kết quả tìm kiếm vào file
+        # Lưu để có thể đánh giá lại sau này hoặc phân tích
         search_result_entry = {
-            "query_id": query_info["query_id"],
-            "query_text": query_text,
-            "category": query_info["category"],
-            "target_person_id": query_info["target_person_id"],
-            "difficulty": query_info["difficulty"],
-            "search_results": search_results,
-            "timestamp": None  # Có thể thêm timestamp nếu cần
+            "query_id": query_info["query_id"],           # ID của query
+            "query_text": query_text,                      # Nội dung query
+            "category": query_info["category"],            # Danh mục (BE, FE, PM, etc.)
+            "target_person_id": query_info["target_person_id"],  # ID người mục tiêu
+            "difficulty": query_info["difficulty"],       # Độ khó (standard, hard)
+            "search_results": search_results,              # 5 kết quả tìm kiếm
+            "timestamp": None
         }
-        # Kiểm tra xem query_id đã tồn tại chưa (tránh trùng lặp khi tiếp tục)
+        # Kiểm tra xem query này đã được xử lý chưa (tránh trùng lặp khi tiếp tục)
         existing_idx = next((i for i, item in enumerate(search_results_data) 
                             if item.get("query_id") == query_info["query_id"]), None)
         if existing_idx is not None:
+            # Nếu đã có → cập nhật (trường hợp chạy lại)
             search_results_data[existing_idx] = search_result_entry
         else:
+            # Nếu chưa có → thêm mới
             search_results_data.append(search_result_entry)
         save_search_results(search_results_data)
         
+        # Bước 3: Tính metrics đánh giá
         if not search_results:
+            # Nếu không tìm thấy kết quả nào → metrics = 0
             print("Không tìm thấy kết quả nào!")
             metrics = {
-                'precision_at_k': 0.0,
-                'ap_at_k': 0.0,
-                'relevance_labels': [0, 0, 0, 0, 0],
-                'num_relevant': 0
+                'precision_at_k': 0.0,                    # Không có kết quả phù hợp
+                'ap_at_k': 0.0,                          # Không có kết quả phù hợp
+                'relevance_labels': [0, 0, 0, 0, 0],     # Tất cả đều không phù hợp
+                'num_relevant': 0                        # 0 kết quả phù hợp
             }
         else:
-            # Hiển thị kết quả (truyền query_text để tính relevance nếu cần)
+            # Hiển thị kết quả tìm kiếm cho người dùng xem
+            # Hiển thị thông tin query và 5 kết quả với đánh giá phù hợp/không phù hợp
             display_results(search_results, query_info, query_text)
             
-            # Tính metrics (Precision@K, AP@K)
+            # Xác định threshold và method dựa trên cấu hình
             if EVALUATION_METHOD == "distance":
+                # Dùng distance: distance < threshold → phù hợp
                 threshold = DISTANCE_THRESHOLD
                 method_desc = f"distance < {threshold}"
             else:
+                # Dùng relevance score: score >= threshold → phù hợp
                 threshold = RELEVANCE_THRESHOLD
                 method_desc = f"relevance score >= {threshold}"
             
+            # Tính các metrics đánh giá
+            # - Precision@5: Tỷ lệ kết quả phù hợp trong top 5
+            # - AP@5: Đánh giá chất lượng thứ tự sắp xếp
             metrics = calculate_metrics(
-                search_results, 
-                query=query_text,
-                k=5,
-                method=EVALUATION_METHOD,
-                threshold=threshold
+                search_results,              # 5 kết quả tìm kiếm
+                query=query_text,            # Query để tính relevance score (nếu dùng method="relevance")
+                k=5,                        # Đánh giá top 5
+                method=EVALUATION_METHOD,    # Phương pháp đánh giá: "distance" hoặc "relevance"
+                threshold=threshold         # Ngưỡng để xác định phù hợp
             )
             
             # Hiển thị metrics
@@ -677,10 +839,10 @@ def process_queries():
         print("ĐÃ XỬ LÝ HẾT TẤT CẢ QUERIES!")
         print("="*80)
         
-        # Tính thống kê
+        # Tính thống kê tổng hợp
         total = len(results)
         if total > 0:
-            # Tính MAP@5 (Mean Average Precision@5)
+            # Tính MAP@5 (trung bình AP@5 của tất cả queries)
             ap_scores = [r.get("ap_at_5", 0.0) for r in results]
             map_at_5 = sum(ap_scores) / total if total > 0 else 0.0
             
@@ -922,6 +1084,10 @@ def process_queries():
         print(f"Còn lại {len(all_queries) - end_index} queries.")
         print(f"Chạy lại script để tiếp tục từ query {end_index + 1}")
 
+
+# ============================================================================
+# CHẠY CHƯƠNG TRÌNH
+# ============================================================================
 
 if __name__ == "__main__":
     try:
